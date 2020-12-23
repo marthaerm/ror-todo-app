@@ -1,4 +1,5 @@
 class TodosController < ApplicationController
+  skip_before_action :verify_authenticity_token
   def index
     todos = Todo.order("created_at DESC")
     render json: todos
@@ -11,7 +12,7 @@ class TodosController < ApplicationController
 
   def update
     todo = Todo.find(params[:id])
-    todo.update_attributes(todo_param)
+    todo.update(todo_param)
     render json: todo
   end
 
