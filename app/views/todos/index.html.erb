@@ -1,2 +1,82 @@
-<h1>Todos#index</h1>
-<p>Find me in app/views/todos/index.html.erb</p>
+<div>
+  <div class="inputContainer">
+    <input
+      id="taskInput"
+      class="taskInput"
+      type="text"
+      placeholder="Add a task"
+      maxLength="50"
+    />
+  </div>
+  <div class="listWrapper">
+    <ul class="taskList">
+      <% @todos.each do |todo| %>
+      <li class="task" id=<%= todo.id %>>
+        <input
+          class="taskCheckbox"
+          type="checkbox"
+          <% if todo.done -%>
+            checked
+          <% end %>
+          onchange="updateTodo(<%= todo.id %>, this.checked)"
+        />
+        <label class="taskLabel"><%= todo.title %></label>
+        <span
+          class="deleteTaskBtn"
+          onclick="deleteTodo(<%= todo.id %>)"
+        >
+        x
+        </span>
+      </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+
+<script>
+    let createTodoInput = document.getElementById('taskInput');
+    let request = new XMLHttpRequest();
+    createTodoInput.addEventListener('keyup',(event) => {
+        const keyName = event.key;
+        if(keyName === "Enter" && createTodoInput.value !== ""){
+
+            let data = '{"todo" :{"title": "'+ createTodoInput.value + '","done": false}}';
+            request.open("POST", "/api/v1/todos.json");
+            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            try {
+                request.send(data);
+                window.location.reload(true);
+            }
+            catch (e){
+                console.log(e);
+            }
+
+        }
+    });
+
+    function deleteTodo(id){
+        request.open("DELETE", "/api/v1/todos/"+id+".json");
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        try{
+            request.send();
+            window.location.reload(true);
+        }
+        catch (e){
+            console.log(e);
+        }
+    }
+
+    function updateTodo(id, done){
+        request.open("PUT", "/api/v1/todos/"+id+".json");
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        let data = '{"todo" :{"done": "'+ done + '"}}';
+        try{
+            request.send(data);
+            window.location.reload(true);
+        }
+        catch (e){
+            console.log(e);
+        }
+    }
+
+</script>
